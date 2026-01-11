@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4-Item Layout Gallery</title>
+    <style>
+      :root {
+        --bg: #f4f4f9;
+        --accent: #4a90e2;
+        --text: #333;
+        --card: #ffffff;
+        --center-size: 80px;
+        --item-size: 60px;
+        --radius: 120px;
+      }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: 40px;
+      }
+      section {
+        margin-bottom: 80px;
+      }
+      h2 {
+        border-bottom: 2px solid var(--accent);
+        display: inline-block;
+        margin-bottom: 30px;
+      }
+      .box {
+        background: var(--accent);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        border-radius: 8px;
+        font-size: 1.2rem;
+      }
+
+      /* 1. BENTO BOX LAYOUT */
+      .bento-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: 150px 150px;
+        gap: 15px;
+        max-width: 800px;
+      }
+      .bento-1 {
+        grid-row: span 2;
+        background: #2c3e50;
+      } /* Large Hero */
+      .bento-2,
+      .bento-3,
+      .bento-4 {
+        background: var(--accent);
+      }
+
+      /* 2. RADIAL (CIRCULAR) LAYOUT */
+      .radial-container {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: 50px auto;
+      }
+      .center-hub {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80px;
+        height: 80px;
+        background: #333;
+        border-radius: 50%;
+        z-index: 2;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .radial-item {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+      }
+      /* Positioning around circle */
+      .r1 {
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .r2 {
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .r3 {
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .r4 {
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      /* 3. QUADRANT LAYOUT (2x2) */
+      .quad-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 200px 200px;
+        gap: 10px;
+        max-width: 600px;
+      }
+
+      /* 4. ZIG-ZAG LAYOUT */
+      .zigzag-container {
+        max-width: 600px;
+      }
+      .zigzag-item {
+        width: 60%;
+        height: 100px;
+        margin-bottom: 20px;
+        background: #8e44ad;
+      }
+      .zigzag-item:nth-child(even) {
+        margin-left: 40%;
+        background: #9b59b6;
+      }
+
+      /* 5. ACCORDION EXPANSION */
+      .accordion {
+        display: flex;
+        height: 300px;
+        gap: 10px;
+        max-width: 800px;
+      }
+      .acc-item {
+        flex: 1;
+        transition: all 0.5s ease;
+        cursor: pointer;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .acc-item:hover {
+        flex: 5;
+        background: #e67e22;
+      }
+
+      /* The parent container */
+      .radial-nav {
+        position: relative;
+        flex: 1;
+        height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      /* The Center Hub */
+      .hub {
+        width: var(--center-size);
+        height: var(--center-size);
+        background: green;
+        color: blue;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        z-index: 10;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        transition: transform 0.3s ease;
+      }
+
+      /* Common style for the 4 items */
+      .item {
+        position: absolute;
+        width: var(--item-size);
+        height: var(--item-size);
+        background: red;
+        color: #4a90e2;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        /* Start at center, invisible and rotated */
+        opacity: 0;
+        transform: translate(0, 0) rotate(0deg);
+        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 5;
+      }
+
+      /* Hover Logic: Move items to their coordinates */
+      .radial-nav:hover .hub {
+        transform: scale(0.9);
+      }
+
+      .radial-nav:hover .item {
+        opacity: 1;
+      }
+
+      /* Item 1: Top (0 degrees) */
+      .radial-nav:hover .item:nth-child(2) {
+        transform: translate(0, calc(-1 * var(--radius))) rotate(360deg);
+      }
+
+      /* Item 2: Right (90 degrees) */
+      .radial-nav:hover .item:nth-child(3) {
+        transform: translate(var(--radius), 0) rotate(360deg);
+      }
+
+      /* Item 3: Bottom (180 degrees) */
+      .radial-nav:hover .item:nth-child(4) {
+        transform: translate(0, var(--radius)) rotate(360deg);
+      }
+
+      /* Item 4: Left (270 degrees) */
+      .radial-nav:hover .item:nth-child(5) {
+        transform: translate(calc(-1 * var(--radius)), 0) rotate(360deg);
+      }
+
+      .item:hover {
+        background: #ffcc00;
+        color: #000;
+      }
+
+      .stack-container {
+        position: relative;
+        height: 250px;
+        max-width: 400px;
+      }
+      .stack-item {
+        position: absolute;
+        width: 200px;
+        height: 150px;
+        background: rgba(74, 144, 226, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s ease;
+      }
+      /* Staggering the stack */
+      .s1 {
+        top: 0;
+        left: 0;
+        z-index: 1;
+      }
+      .s2 {
+        top: 20px;
+        left: 40px;
+        z-index: 2;
+        background: rgba(74, 144, 226, 0.4);
+      }
+      .s3 {
+        top: 40px;
+        left: 80px;
+        z-index: 3;
+        background: rgba(74, 144, 226, 0.6);
+      }
+      .s4 {
+        top: 60px;
+        left: 120px;
+        z-index: 4;
+        background: rgba(74, 144, 226, 0.8);
+      }
+
+      .stack-item:hover {
+        transform: translateY(-20px) scale(1.05);
+        z-index: 10;
+        background: var(--accent);
+      }
+
+      /* 7. DIAMOND GRID */
+      .diamond-wrapper {
+        display: grid;
+        grid-template-columns: repeat(2, 100px);
+        gap: 10px;
+        transform: rotate(45deg);
+        margin: 100px;
+        position: absolute;
+        top: 0;
+      }
+      .diamond-item {
+        width: 100px;
+        height: 100px;
+        background: #e74c3c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+      .diamond-item span {
+        transform: rotate(-45deg); /* Keep text upright */
+      }
+
+      /* 8. FLOATING ORBS */
+      .orb-container {
+        display: flex;
+        gap: 30px;
+      }
+      .orb {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        animation: float 3s ease-in-out infinite;
+      }
+      .orb:nth-child(2) {
+        animation-delay: 0.5s;
+      }
+      .orb:nth-child(3) {
+        animation-delay: 1s;
+      }
+      .orb:nth-child(4) {
+        animation-delay: 1.5s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+
+
+
+      /* 9. DNA HELIX */
+.helix-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+.helix-item {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #3498db;
+}
+/* Move them in a wave pattern */
+.h1 { transform: translateX(-50px); }
+.h2 { transform: translateX(50px); }
+.h3 { transform: translateX(-50px); }
+.h4 { transform: translateX(50px); }
+
+/* 10. SKEWED PARALLELOGRAM */
+.skew-container {
+    display: flex;
+    gap: 10px;
+    overflow: hidden;
+}
+.skew-item {
+    flex: 1;
+    height: 200px;
+    background: #2ecc71;
+    transform: skewX(-15deg); /* The "lean" */
+    transition: all 0.3s;
+}
+.skew-item span {
+    display: block;
+    transform: skewX(15deg); /* Un-skew the text so it's readable */
+}
+.skew-item:hover {
+    flex: 1.5;
+    background: #27ae60;
+}
+
+/* 11. POLAROID SCATTER */
+.scatter-container {
+    display: flex;
+    gap: 20px;
+    padding: 50px;
+}
+.polaroid {
+    width: 120px;
+    height: 150px;
+    background: white;
+    padding: 10px;
+    padding-bottom: 30px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    color: #333;
+    transition: transform 0.3s;
+}
+.p1 { transform: rotate(-10deg); }
+.p2 { transform: rotate(5deg); }
+.p3 { transform: rotate(-5deg); }
+.p4 { transform: rotate(12deg); }
+
+.polaroid:hover {
+    transform: rotate(0deg) scale(1.2);
+    z-index: 20;
+}
+
+/* 12. CORNER FAN */
+.fan-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+.fan-item {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 0 100% 0 0;
+    background: #e67e22;
+    transform-origin: bottom left;
+    transition: transform 0.5s ease;
+    border: 1px solid white;
+}
+/* Hidden behind each other initially */
+.fan-container:hover .f1 { transform: rotate(0deg); }
+.fan-container:hover .f2 { transform: rotate(30deg); }
+.fan-container:hover .f3 { transform: rotate(60deg); }
+.fan-container:hover .f4 { transform: rotate(90deg); }
+    </style>
+  </head>
+  <body>
+    <section>
+      <h2>1. Bento Box (Hierarchy)</h2>
+      <div class="bento-grid">
+        <div class="box bento-1">Feature</div>
+        <div class="box bento-2">02</div>
+        <div class="box bento-3">03</div>
+        <div class="box bento-4">04</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Radial (Circular)</h2>
+      <div style="display: flex">
+        <div class="radial-container">
+          <div class="center-hub">Core</div>
+          <div class="box radial-item r1">01</div>
+          <div class="box radial-item r2">02</div>
+          <div class="box radial-item r3">03</div>
+          <div class="box radial-item r4">04</div>
+        </div>
+        <div class="radial-nav">
+          <div class="hub">HOVER</div>
+          <div class="item">01</div>
+          <div class="item">02</div>
+          <div class="item">03</div>
+          <div class="item">04</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Quadrant (2x2)</h2>
+      <div class="quad-grid">
+        <div class="box" style="background: #1abc9c">North West</div>
+        <div class="box" style="background: #16a085">North East</div>
+        <div class="box" style="background: #16a085">South West</div>
+        <div class="box" style="background: #1abc9c">South East</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Zig-Zag (Flow)</h2>
+      <div class="zigzag-container">
+        <div class="box zigzag-item">Step 1</div>
+        <div class="box zigzag-item">Step 2</div>
+        <div class="box zigzag-item">Step 3</div>
+        <div class="box zigzag-item">Step 4</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>5. Hover Accordion (Interactive)</h2>
+      <div class="accordion">
+        <div class="box acc-item">Hover Me 1</div>
+        <div class="box acc-item">Hover Me 2</div>
+        <div class="box acc-item">Hover Me 3</div>
+        <div class="box acc-item">Hover Me 4</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>6. Glass Stack (3D Layering)</h2>
+      <div class="stack-container">
+        <div class="box stack-item s1">Back</div>
+        <div class="box stack-item s2">Layer 2</div>
+        <div class="box stack-item s3">Layer 1</div>
+        <div class="box stack-item s4">Front</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>7. Diamond Grid</h2>
+      <div style="position: relative; height: 300px">
+        <div class="diamond-wrapper">
+          <div class="box diamond-item"><span>01</span></div>
+          <div class="box diamond-item"><span>02</span></div>
+          <div class="box diamond-item"><span>03</span></div>
+          <div class="box diamond-item"><span>04</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>8. Floating Orbs (Organic)</h2>
+      <div class="orb-container">
+        <div class="box orb">01</div>
+        <div class="box orb">02</div>
+        <div class="box orb">03</div>
+        <div class="box orb">04</div>
+      </div>
+    </section>
+
+
+
+    <section>
+        <h2>9. DNA Helix (Oscillating)</h2>
+        <div class="helix-container">
+            <div class="box helix-item h1">01</div>
+            <div class="box helix-item h2">02</div>
+            <div class="box helix-item h3">03</div>
+            <div class="box helix-item h4">04</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>10. Skewed Parallelograms</h2>
+        <div class="skew-container">
+            <div class="box skew-item"><span>Speed</span></div>
+            <div class="box skew-item"><span>Power</span></div>
+            <div class="box skew-item"><span>Style</span></div>
+            <div class="box skew-item"><span>Flow</span></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>11. Polaroid Scatter</h2>
+        <div class="scatter-container">
+            <div class="polaroid p1">Photo 1</div>
+            <div class="polaroid p2">Photo 2</div>
+            <div class="polaroid p3">Photo 3</div>
+            <div class="polaroid p4">Photo 4</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>12. Corner Fan (Hover Corner)</h2>
+        <div class="fan-container">
+            <div class="fan-item f4">04</div>
+            <div class="fan-item f3">03</div>
+            <div class="fan-item f2">02</div>
+            <div class="fan-item f1">01</div>
+        </div>
+    </section>
+  </body>
+</html>
